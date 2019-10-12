@@ -3,12 +3,9 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
-mongoose.connect(
-  "mongodb+srv://ramyakandasamy:Bluem78@cluster0-6bivg.mongodb.net/test?retryWrites=true&w=majority",
-  () => {
-    console.log("Database connected --App.js");
-  }
-);
+mongoose.connect("mongodb+srv:///test?retryWrites=true&w=majority", () => {
+  console.log("Database connected --App.js");
+});
 
 require("./dataBase");
 const dataBase = mongoose.model("Employees");
@@ -145,10 +142,10 @@ app.get("/employees", (req, res) => {
       }
     });
 });
-app.post("/employee", (req, res) => {
+app.post("/employee/:name/:timeOffTotal", (req, res) => {
   var employee = new dataBase({
-    name: req.body.name,
-    timeOffTotal: req.body.timeOffTotal
+    name: req.params.name,
+    timeOffTotal: req.params.timeOffTotal
   });
   employee
     .save()
