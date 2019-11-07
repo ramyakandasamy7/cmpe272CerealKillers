@@ -39,7 +39,7 @@ Date.prototype.addHours = function(h) {
   this.setTime(this.getTime() + h * 60 * 60 * 1000);
   return this;
 };
-
+/** set TimeOff for an employee by ID**/
 app.put("/employee/:id/setTimeOff/:number", (req, res) => {
   const number = parseInt(req.params.number);
   dataBase
@@ -51,6 +51,8 @@ app.put("/employee/:id/setTimeOff/:number", (req, res) => {
       res.json(employee);
     });
 });
+
+/** request for time of for an employee by ID*/
 app.put("/employee/:id/:startDate/:endDate/:startHour/:endHour", (req, res) => {
   const vstartDate = new Date(req.params.startDate).addHours(
     req.params.startHour
@@ -104,6 +106,7 @@ app.put("/employee/:id/:startDate/:endDate/:startHour/:endHour", (req, res) => {
   });
 });
 
+/**remove timeOff request for employee by ID **/
 app.put("/employee/:id/modifyDate/:dateid", (req, res) => {
   dataBase.findById(req.params.id).then(date => {
     date.timeoffRequests.id(req.params.dateid).remove();
@@ -113,6 +116,8 @@ app.put("/employee/:id/modifyDate/:dateid", (req, res) => {
     });
   });
 });
+
+/** get employee by ID*/
 app.get("/employee/:id", (req, res) => {
   dataBase
     .findById(req.params.id)
@@ -129,7 +134,7 @@ app.get("/employee/:id", (req, res) => {
       }
     });
 });
-
+/** return all employees*/
 app.get("/employees", (req, res) => {
   dataBase
     .find()
@@ -142,6 +147,7 @@ app.get("/employees", (req, res) => {
       }
     });
 });
+/**create new employee with timeOffTotal**/
 app.post("/employee/:name/:timeOffTotal", (req, res) => {
   var employee = new dataBase({
     name: req.params.name,
