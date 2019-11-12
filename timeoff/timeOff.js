@@ -5,11 +5,11 @@ app.use(bodyParser.json());
 var mysql = require("mysql");
 var con = mysql.createConnection(
   {
-    host: "ec2-18-208-107-185.compute-1.amazonaws.com",
+    host: "INSERT",
     user: root,
-    password: "Cmpe272!",
+    password: "INSERT",
     port: 3306,
-    database: "employees"
+    database: "INSERT"
   },
   { multipleStatements: true }
 );
