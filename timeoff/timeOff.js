@@ -51,47 +51,43 @@ Date.prototype.addHours = function(h) {
   return this;
 };
 /** create a request for time off for an employee by ID*/
-app.post(
-  "/timeoff/:empid/:startDateYear/:startDateMonth/:startDateDay/:endDateYear/:endDateMonth/:endDateDay",
-  (req, res) => {
-    input_end_date = new Date(
-      req.params.endDateYear,
-      req.params.endDateMonth,
-      req.params.endDateDay
-    );
-    console.log(req.params.endDateMonth + input_end_date);
-    input_start_date = new Date(
-      req.params.startDateYear,
-      req.params.startDateMonth,
-      req.params.startDateDay
-    );
-    var numhours = getNumWorkDays(input_start_date, input_end_date) * 8;
-    console.log("number of hours" + numhours);
-    var entry = {
-      employee_id: req.params.empid,
-      end_date: input_end_date,
-      start_date: input_start_date,
-      status: "Pending",
-      numberofhours: numhours
-    };
+app.post("/timeoff", (req, res) => {
+  input_end_date = new Date(
+    req.body.endDateYear,
+    req.body.endDateMonth,
+    req.body.endDateDay
+  );
+  input_start_date = new Date(
+    req.body.startDateYear,
+    req.body.startDateMonth,
+    req.body.startDateDay
+  );
+  var numhours = getNumWorkDays(input_start_date, input_end_date) * 8;
+  console.log("number of hours" + numhours);
+  var entry = {
+    employee_id: req.body.empid,
+    end_date: input_end_date,
+    start_date: input_start_date,
+    status: "Pending",
+    numberofhours: numhours
+  };
 
-    var query = con.query("INSERT INTO timeoff SET ?", entry, function(
-      err,
-      results
-    ) {
-      if (err) throw err;
-    });
-    console.log(query.sql);
-  }
-);
+  var query = con.query("INSERT INTO timeoff SET ?", entry, function(
+    err,
+    results
+  ) {
+    if (err) throw err;
+  });
+  console.log(query.sql);
+});
 
 //approve or deline timeoff requests and subtract from PTO table
-app.post("/timeoff/:requestid/:status", function(req, res) {
+app.post("/timeoff", function(req, res) {
   var emp_ID;
-  if (req.params.status == "declined") {
+  if (req.body.status == "declined") {
     con.query(
       "UPDATE timeoff SET status=? WHERE id = ?",
-      ["declined", req.params.requestid, req.params.requestid],
+      ["declined", req.body.requestid, req.body.requestid],
       function(err, results, fields) {
         if (err) throw err;
         else {
@@ -103,7 +99,7 @@ app.post("/timeoff/:requestid/:status", function(req, res) {
   } else {
     con.query(
       "UPDATE timeoff SET status=? WHERE id = ?",
-      ["approved", req.params.requestid, req.params.requestid],
+      ["approved", req.body.requestid, req.body.requestid],
       function(err, results, fields) {
         if (err) throw err;
         else {
@@ -113,7 +109,7 @@ app.post("/timeoff/:requestid/:status", function(req, res) {
     );
     con.query(
       "SELECT employee_id, numberofhours FROM timeoff WHERE id= ? ",
-      [req.params.requestid],
+      [req.body.requestid],
       function(err, data) {
         if (err) throw err;
         else {
@@ -155,7 +151,7 @@ app.get("/employee/:id", (req, res) => {
   //returns all requests
   con.query(
     "SELECT * FROM timeoff WHERE employee_id=?",
-    [req.params.id],
+    [req.body.id],
     function(err, data) {
       if (err) throw err;
       else {
@@ -164,7 +160,7 @@ app.get("/employee/:id", (req, res) => {
     }
   );
   //returns time off total
-  con.query("SELECT * from pto where emp_no=?", [req.params.id], function(
+  con.query("SELECT * from pto where emp_no=?", [req.body.id], function(
     err,
     data
   ) {
@@ -175,10 +171,10 @@ app.get("/employee/:id", (req, res) => {
   });
 });
 //only if administrator, can you use this method to add more hours
-app.post("/timeoffincrement/:empid/:increment", (req, res) => {
+app.post("/timeoffincrement", (req, res) => {
   //check if admin
-  var tempinc = parseInt(req.params.increment);
-  var empid = parseInt(req.params.empid);
+  var tempinc = parseInt(req.body.increment);
+  var empid = parseInt(req.body.empid);
   con.query(
     "SELECT current_amount FROM pto where emp_no = ?",
     [empid],
@@ -202,6 +198,8 @@ app.post("/timeoffincrement/:empid/:increment", (req, res) => {
     }
   );
 });
+
+//method here to modify "status"
 app.listen("8000", () => {
   console.log("up and running - time off service!");
 });
