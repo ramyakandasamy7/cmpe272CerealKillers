@@ -11,7 +11,6 @@ const dashboardRouter = require("./routes/dashboard");
 const publicRouter = require("./routes/public");
 const usersRouter = require("./routes/users");
 
-
 // App initialization
 const app = express();
 
@@ -24,11 +23,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "assets")));
 
-app.use(session({
-  secret: process.env.SECRET,
-  resave: true,
-  saveUninitialized: false
-}));
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: true,
+    saveUninitialized: false
+  })
+);
 
 app.use(auth.oidc.router);
 app.use(middleware.addUser);
@@ -50,6 +51,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+app.listen(3000, function() {
+  console.log("Listening on port 3000");
+});
 
-
-module.exports = app;
+//module.exports = app;
