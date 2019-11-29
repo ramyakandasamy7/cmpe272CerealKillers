@@ -9,12 +9,17 @@ var oktaSignIn = new OktaSignIn({
 	}
 });
 var idToken;
+var accessToken;
 console.log(oktaSignIn);
 
 function initUI() {
-	if (checkForTokens(window.oktaSignIn) === true) {
+	let hasTokens = checkForTokens(window.oktaSignIn);
+	//let hasTokens = true;
+	console.log(hasTokens);
+	if (hasTokens === true) {
 		renderContainers();
 	} else {
+		console.log("initUI");
 		renderLogin(window.oktaSignIn);
 	}
 
@@ -26,7 +31,9 @@ function logout() {
 		if (err) {
 			console.log(err);
 		} else {
+			console.log("logout");
 			$('#root').empty();
+			window.localStorage.removeItem('okta-token-storage');
 			renderLogin(osi);
 		}
 	});
@@ -44,50 +51,40 @@ function renderLogin(osi) {
 }
 
 function checkForTokens(osi) {
-	console.log(osi.hasTokensInUrl());
 	if (osi.hasTokensInUrl()) {
-		console.log("I HAVE TOKENS");
-		osi.authClient.token.parseFromUrl().then(function success(tokens) {
-			console.log(tokens);
-			for (i in tokens){
+		console.log("Tokens in URL");
+		osi.authClient.token.parseFromUrl().then(function(tokens) {
+			for (i in tokens) {
 				if (tokens[i].idToken) {
-					osi.authClient.tokenManager.add('idToken', tokens[i]);
-					console.log("Found idToken");
+					osi.authClient.tokenManager.add('idToken',tokens[i]);
 				}
 				if (tokens[i].accessToken) {
-					osi.authClient.tokenManager.add('accessToken', tokens[i]); 
-					console.log("Found accessToken");
+					osi.authClient.tokenManager.add('accessToken',tokens[i]);
 				}
 			}
-			console.log(osi);
-			window.idToken = osi.authClient.tokenManager.get('idToken');
-			console.log(window.idToken.claims.email);
-			window.location.hash='';
+			//let tokens = JSON.parse( window.localStorage.getItem('okta-token-storage') );
+			//console.log(tokens);
+			//window.idToken 	   = tokens.idToken;
+			//window.accessToken = tokens.accessToken;
+			//console.log(window.accessToken);
+			//console.log(window.idToken);
 		});
-		//console.log(window.token);
-		//access_token = osi.authClient.tokenManager.get('access_token');
-		//console.log(access_token);
-		//window.userInfo = osi.authClient.token.getUserInfo(access_token);
-		//console.log(window.userInfo);
+		
+		return true;
+	} else if (window.localStorage.getItem('okta-token-storage') !== null) {
+		console.log("Tokens in localStorage");
+		let tokens = JSON.parse( window.localStorage.getItem('okta-token-storage') );
+		console.log(tokens);
+		window.idToken 	   = tokens.idToken;
+		window.accessToken = tokens.accessToken;
+		console.log(window.accessToken);
+		console.log(window.idToken);
+		history.pushState("", document.title, window.location.pathname);
 		return true;
 	} else {
-		console.log("I DONT HAVE TOKENS");
-		osi.authClient.session.get().then(function(ses) {
-			if (ses.status === 'ACTIVE') {
-				console.log(ses);
-				window.login = ses.login;
-				osi.authClient.tokenManager.add('id_token', ses[0]);
-				osi.authClient.tokenManager.add('access_token', ses[1]);
-				console.log("osi");
-				return true;
-			} else {
-				renderLogin(osi);		
-				console.log(osi);
-			}
-		//}).catch(function(err) {
-		//	console.log(err);
-		//	return false;
-		});
+		console.log("No tokens");
+		history.pushState("", document.title, window.location.pathname);
+		return false;
 	}
 }
 
