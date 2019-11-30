@@ -1,6 +1,42 @@
 
 'use strict';
+var mysql      = require('mysql');
+var connection = mysql.createConnection({
+  host     : '18.208.107.185',
+  port:3306,
+  user     : 'root',
+  password : 'Cmpe272!',
+  database: 'employees'
+});
+connection.connect(function(err){
+if(!err) {
+    console.log("Database is connected");
+    /*connection.query('SELECT * from employees', function(err, result) {
+        if(err) {
+            console.log(err);
+        }
+        else {
+            console.log(result);
+        }
+    })*/
+} else {
+    console.log(err);
+}
+});
 
+/*var sql = "CREATE TABLE expense_limit (id INT AUTO_INCREMENT PRIMARY KEY, employee_id INT, expense_limit INT)"
+connection.query(sql, function(err,result) {
+  console.log(err);
+  console.log(result)
+});
+sql = "INSERT INTO expense_limit(employee_id, expense_limit) VALUES (10001, 10000)"
+connection.query(sql, function(err, result){
+
+});
+connection.query('SELECT * from expense_limit', function(err,result) {
+  console.log(result)
+});
+*/
 
 var mongoose = require('mongoose'),
   Expense = mongoose.model('Expenses'),
@@ -37,6 +73,10 @@ var mongoose = require('mongoose'),
     }
   });
   var upload = multer({storage: storage});
+
+  exports.showexpense = function(req, res) {
+    res.render('index');
+  }
 
   exports.get_image = function(req,res) {
     gfs.files.find().toArray((err, files) => {
@@ -85,93 +125,164 @@ exports.expense_limit = function(req,res) {
 }
 
 exports.create_expenselimit = function(req, res) {
-  var new_expense_limit = new limit(req.body);
+  var sql = "INSERT INTO expense_limit(employee_id, expense_limit) VALUES (" + req.body.employee_id +", " + req.body.limit + ")"
+  connection.query(sql, function(err, result){
+    if(err) {
+      res.send(err);
+    }
+    else {
+      res.json(result);
+    }
+  });
+  /*var new_expense_limit = new limit(req.body);
   new_expense_limit.save(function(err, expense) {
     if (err)
       res.send(err);
     res.json(expense);
-  });
+  });*/
 };
 
 exports.read_expense_limit = function(req, res) {
-  limit.findById(req.params.expenseId, function(err, expense) {
+  connection.query("SELECT * from expense_limit WHERE employee_id = " + req.body.employee_id, function(err, result) {
+    if(err) {
+        res.send(err);
+    }
+    else {
+        res.json(result);
+    }
+  })
+  /*limit.findById(req.params.expenseId, function(err, expense) {
     if (err)
       res.send(err);
     res.json(expense);
-  });
+  });*/
 };
 
 
 exports.update_expense_limit = function(req, res) {
-  limit.findOneAndUpdate({_id: req.params.expenseId}, req.body, {new: true}, function(err, expense) {
+  connection.query("UPDATE expense_limit SET expense_limit = " + req.body.limit + " WHERE employee_id = " + req.body.employee_id, function(err, result) {
+    if(err) {
+        res.send(err);
+    }
+    else {
+        res.json(result);
+    }
+  })
+  /*limit.findOneAndUpdate({_id: req.params.expenseId}, req.body, {new: true}, function(err, expense) {
     if (err)
       res.send(err);
     res.json(expense);
-  });
+  });*/
 };
 
 
 exports.delete_expense_limit = function(req, res) {
 
 
-  limit.remove({
+  /*limit.remove({
     _id: req.params.expenseId
   }, function(err, expense) {
     if (err)
       res.send(err);
     res.json({ message: 'Expense successfully deleted' });
-  });
+  });*/
 };
 
 //Expenses
 
 exports.list_all_expenses = function(req, res) {
-  Expense.find({}, function(err, expense) {
+    connection.query('SELECT * from expenses WHERE employee_id = ' + req.body.employee_id, function(err, result) {
+        if(err) {
+            res.send(err);
+        }
+        else {
+            res.json(result);
+        }
+      })
+  /*Expense.find({}, function(err, expense) {
     if (err)
       res.send(err);
     res.json(expense);
-  });
+  });*/
 };
 
 
 
 
 exports.create_a_expense = function(req, res) {
-  var new_expense = new Expense(req.body);
+  var employee_id = req.body.employee_id;
+  var date = req.body.date;
+  var amount = req.body.amount;
+  connection.query('INSERT INTO expenses(employee_id, amount) VALUES('+ "'"  + employee_id +"','"  + amount +"')", function(err, result) {
+    if(err) {
+        res.send(err);
+    }
+    else {
+        res.json(result);
+    }
+})
+  /*var new_expense = new Expense(req.body);
   new_expense.save(function(err, expense) {
     if (err)
       res.send(err);
     res.json(expense);
-  });
+  });*/
 };
 
 
 exports.read_a_expense = function(req, res) {
-  Expense.findById(req.params.expenseId, function(err, expense) {
+  var id = req.params.expenseId;
+  connection.query('SELECT * from expenses WHERE id=' + "'" + id + "'", function(err, result) {
+    if(err) {
+        res.send(err);
+    }
+    else {
+        res.json(result);
+    }
+  })
+  /*Expense.findById(req.params.expenseId, function(err, expense) {
     if (err)
       res.send(err);
     res.json(expense);
-  });
+  });*/
 };
 
 
 exports.update_a_expense = function(req, res) {
-  Expense.findOneAndUpdate({_id: req.params.expenseId}, req.body, {new: true}, function(err, expense) {
+  var id = req.params.expenseId;
+  var status = req.body.status;
+  connection.query("UPDATE expenses SET status = '"+ status +"' WHERE id = '" + id +"'", function(err, result) {
+    if(err) {
+        res.send(err);
+    }
+    else {
+        res.json(result);
+    }
+  })
+  /*Expense.findOneAndUpdate({_id: req.params.expenseId}, req.body, {new: true}, function(err, expense) {
     if (err)
       res.send(err);
     res.json(expense);
-  });
+  });*/
 };
 
 
 exports.delete_a_expense = function(req, res) {
+  var id = req.params.expenseId;
+  connection.query("'DELETE FROM expenses WHERE id = '" + id  +"'", function(err, result) {
+    if(err) {
+        res.send(err);
+    }
+    else {
+        res.json(result);
+    }
+  })
 
-
-  Expense.remove({
+  /*Expense.remove({
     _id: req.params.expenseId
   }, function(err, expense) {
     if (err)
       res.send(err);
     res.json({ message: 'Expense successfully deleted' });
-  });
+  });*/
 };

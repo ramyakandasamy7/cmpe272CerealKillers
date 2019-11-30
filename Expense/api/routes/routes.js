@@ -50,6 +50,9 @@ module.exports = function(app) {
     });
     var upload = multer({storage: storage});
 
+  app.route('/')
+    .get(todoList.showexpense)
+
   app.route('/expenseimage')
   .get(todoList.get_image)
   .post(upload.single('file'), todoList.upload_image);
@@ -57,11 +60,27 @@ module.exports = function(app) {
   app.route('/expenseimage/:filename')
   .get(todoList.display_image);
 
-
+//CALL TO CREATE EXPENSES
   app.route('/expenses')
-    .get(todoList.list_all_expenses)
-    .post(todoList.create_a_expense);
+  .post(todoList.create_a_expense);
 
+  //CALL TO GET ALL EXPENSES OF ONE PERSON USING 'employee_id'
+  app.route("/list_expenses")
+    .post(todoList.list_all_expenses);
+
+  //CALL TO GIVE SOMEONE AN EXPENSE LIMIT USING 'employee_id' and 'limit'
+  app.route("/createlimit")
+    .post(todoList.create_expenselimit);
+
+  //CALL TO UPDATE SOMEONE EXPENSE LIMIT USING 'limit' and 'employee_id'
+  app.route("/updatelimit")
+    .post(todoList.update_expense_limit);
+
+  //CALL TO GET SOMEONE EXPENSE LIMIT USING 'employee_id'
+  app.route("/readlimit")
+    .post(todoList.read_expense_limit)
+
+  
 
   app.route('/expenses/:expenseId')
     .get(todoList.read_a_expense)
