@@ -1,3 +1,14 @@
+nav {
+	background: #dddddd;
+	background: -moz-linear-gradient(top, #dddddd 0%, #52555b 2%, #000000 95%, #bfbfbf 100%);
+	background: -webkit-linear-gradient(top, #dddddd 0%,#52555b 2%,#000000 95%,#bfbfbf 100%);
+	background: linear-gradient(to bottom, #dddddd 0%,#52555b 2%,#000000 95%,#bfbfbf 100%);
+}
+
+.fa-sign-out-alt:hover {
+	color: #ffffff;
+}
+
 .pointer {
 	cursor: pointer;
 }
@@ -38,6 +49,18 @@
 	padding-top: 20px !important;
 	padding-bottom: 20px !important;
 	box-shadow: 0 0 6px #666666 !important;
+}
+
+.jumbotron:hover {
+	color: #ffffff;
+	background: #aebcbf;
+	background: -moz-linear-gradient(top, #aebcbf 0%, #6e7774 50%, #0a0e0a 51%, #0a0809 100%);
+	background: -webkit-linear-gradient(top, #aebcbf 0%,#6e7774 50%,#0a0e0a 51%,#0a0809 100%);
+	background: linear-gradient(to bottom, #aebcbf 0%,#6e7774 50%,#0a0e0a 51%,#0a0809 100%);
+}
+
+.jumbotron:hover i {
+	opacity: 1;
 }
 
 .fas {
