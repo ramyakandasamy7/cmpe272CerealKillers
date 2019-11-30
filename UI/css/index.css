@@ -1,0 +1,57 @@
+.pointer {
+	cursor: pointer;
+}
+
+.slack-bg {
+	background: #cb60b3;
+	background: -moz-linear-gradient(top, #cb60b3 0%, #c146a1 50%, #a80077 51%, #db36a4 100%);
+	background: -webkit-linear-gradient(top, #cb60b3 0%,#c146a1 50%,#a80077 51%,#db36a4 100%);
+	background: linear-gradient(to bottom, #cb60b3 0%,#c146a1 50%,#a80077 51%,#db36a4 100%);
+}
+
+.payroll-bg {
+	background: #6db3f2;
+	background: -moz-linear-gradient(top, #6db3f2 0%, #54a3ee 50%, #3690f0 51%, #1e69de 100%);
+	background: -webkit-linear-gradient(top, #6db3f2 0%,#54a3ee 50%,#3690f0 51%,#1e69de 100%);
+	background: linear-gradient(to bottom, #6db3f2 0%,#54a3ee 50%,#3690f0 51%,#1e69de 100%);
+}
+
+.timeoff-bg {
+	background: #fceabb;
+	background: -moz-linear-gradient(top, #fceabb 0%, #fccd4d 50%, #f8b500 51%, #fbdf93 100%);
+	background: -webkit-linear-gradient(top, #fceabb 0%,#fccd4d 50%,#f8b500 51%,#fbdf93 100%);
+	background: linear-gradient(to bottom, #fceabb 0%,#fccd4d 50%,#f8b500 51%,#fbdf93 100%);
+}
+
+.expense-bg {
+	background: #9dd53a;
+	background: -moz-linear-gradient(top, #9dd53a 0%, #a1d54f 50%, #80c217 51%, #7cbc0a 100%);
+	background: -webkit-linear-gradient(top, #9dd53a 0%,#a1d54f 50%,#80c217 51%,#7cbc0a 100%);
+	background: linear-gradient(to bottom, #9dd53a 0%,#a1d54f 50%,#80c217 51%,#7cbc0a 100%);
+}
+
+.font-sz {
+	font-size: 24px;
+}
+
+.jumbotron {
+	padding-top: 20px !important;
+	padding-bottom: 20px !important;
+	box-shadow: 0 0 6px #666666 !important;
+}
+
+.fas {
+	opacity: 0.8;
+}
+
+.fab {
+	opacity: 0.8;
+}
+
+.turn-cc {
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	transform: rotate(45deg);
+}
