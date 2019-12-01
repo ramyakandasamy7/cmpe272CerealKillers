@@ -2,55 +2,32 @@
 
 var sql = global.con;
 
-exports.list_all_payroll = function(req, res) {
-	sql.query("SELECT * FROM payroll", function(err, result) {
+exports.get_payroll_by_dept = function(req, res) {
+	let dept_no = req.params.dept_no
+	sql.query("SELECT * FROM payroll WHERE dept_no='"+dept_no+"';", function(err, result) {
 		if (err) {
 			res.send(err);
 		} else {
 			res.json(result);
 		}
 	});
-  //Payroll.find({}, function(err, payroll) {
-  //  if (err)
-  //    res.send(err);
-  //  res.json(payroll);
-  //});
 };
 
-exports.add_new_payroll = function(req, res) {
+exports.update_emp_payroll = function(req, res) {
 	let e_id = req.body;
 	console.log(e_id);
-	//sql.query("INSERT");
-  //var new_payroll = new Payroll(req.body);
-  //new_payroll.save(function(err, payroll) {
-  //  if (err)
-  //    res.send(err);
-  //  res.json(payroll);
-  //});
 };
 
-exports.read_a_payroll = function(req, res) {
-  //Payroll.findById(req.params.employee_id, function(err, payroll) {
-  //  if (err)
-  //    res.send(err);
-  //  res.json(payroll);
-  //});
+exports.get_payroll_by_emp = function(req, res) {
+	let emp_no = req.params.emp_no
+	sql.query("SELECT * FROM payroll WHERE emp_no="+emp_no+";", function(err, result) {
+		if (err) {
+			res.send(err);
+		} else {
+			res.json(result);
+		}
+	});
 };
 
-exports.update_a_payroll = function(req, res) {
-  //Payroll.findOneAndUpdate({employee_id: req.params.employee_id}, req.body, {new: true}, function(err, payroll) {
-  //  if (err)
-  //    res.send(err);
-  //  res.json(payroll);
-  //});
-};
 
-exports.delete_a_payroll = function(req, res) {
-  //Payroll.remove({
-  //  employee_id: req.params.employee_id
-  //}, function(err, payroll) {
-  //  if (err)
-  //    res.send(err);
-  //  res.json({ message: 'Payroll entry successfully deleted' });
-  //});
-};
+

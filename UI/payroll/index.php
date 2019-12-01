@@ -16,6 +16,9 @@ session_start();
 
 		<link href="https://global.oktacdn.com/okta-signin-widget/3.2.0/css/okta-sign-in.min.css" type="text/css" rel="stylesheet"/>
 
+			<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css?t=<?php echo time();?>" type='text/css' rel='stylesheet'>
+		<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
 		<link href="/css/index.css?t=<?php echo time();?>" rel="stylesheet">
 		<link href="css/payroll.css?t=<?php echo time();?>" rel="stylesheet">
 		<script src='/js/okta.js?t=<?php echo time();?>'></script>

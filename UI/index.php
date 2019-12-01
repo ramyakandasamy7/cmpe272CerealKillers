@@ -16,6 +16,8 @@ session_start();
 
 		<link href="https://global.oktacdn.com/okta-signin-widget/3.2.0/css/okta-sign-in.min.css" type="text/css" rel="stylesheet"/>
 
+		<script src="https://cdn.jsdelivr.net/npm/js-cookie@beta/dist/js.cookie.min.js"></script>
+
 		<link href="/css/index.css?t=<?php echo time();?>" rel="stylesheet">
 		<script src='/js/okta.js?t=<?php echo time();?>'></script>
 		<script src='js/index.js?t=<?php echo time();?>'></script>

@@ -1,12 +1,33 @@
 
+var employee_info;
+
 function initUI() {
 	let hasTokens = checkForTokens(window.oktaSignIn);
 	if (hasTokens === true) {
+		getEmployeeInfo();
 		renderContainers();
 	} else {
 		renderLogin(window.oktaSignIn);
 	}
 
+}
+
+function getEmployeeInfo() {
+	let email = Cookies.get("ln");
+
+	$.ajax({
+		url: 'get_employee_info.php',
+		type: 'POST',
+		data: {email:email},
+		dataType: 'json'
+	}).done(function(data, message, stat) {
+		if (stat.status === 200) {
+			window.employee_info = data;
+			localStorage.setItem('einfo',JSON.stringify(data));
+		} else {
+			alert(stat.responseText);
+		}
+	});
 }
 
 function renderLogin(osi) {

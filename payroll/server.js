@@ -1,10 +1,9 @@
-var express = require('express'),
-  app = express(),
-  port = process.env.PORT || 3000,
-  mysql = require('mysql'),
-  Payroll = require('./api/models/payrollModel'), //created model loading here
-  bodyParser = require('body-parser'),
-  cors = require('cors');
+var express = require('express');
+var app = express();
+var port = 3000;
+var mysql = require('mysql');
+var bodyParser = require('body-parser');
+var cors = require('cors');
   
 var con = mysql.createConnection({
 	host: "18.208.107.185",
