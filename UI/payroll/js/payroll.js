@@ -22,7 +22,7 @@ function renderContainers() {
                         +"</button>"
                 +"</nav>"	
 		+"<div class='container-fluid'>"
-			+"<h2>Payroll History for "+window.employee_info.first_name+" "+window.employee_info.last_name+"</h2>"
+			+"<h2 id='payroll_title'></h2>"
 			+"<table class='table table-striped table-sm' id='payroll_table'>"
 				+"<thead>"
 					+"<tr>"
@@ -47,6 +47,7 @@ function getPayrollData() {
 	console.log(einfo);
 
 	if (einfo.is_manager == "1") {
+		$("#payroll_title").append("Payroll for "+einfo.dept_name+" Department ("+einfo.dept_no+")");
 		$.ajax({
 			url: 'http://54.165.80.211:3000/payrolls/'+einfo.dept_no,
 			type: 'GET',
@@ -70,6 +71,7 @@ function getPayrollData() {
 			}
 		});
 	} else {
+		$("#payroll_title").append("Payroll for "+einfo.first_name+" "+einfo.last_name+" ("+einfo.emp_no+")");
 		$.ajax({
 			url: 'http://54.165.80.211:3000/payroll/'+einfo.emp_no,
 			type: 'GET',

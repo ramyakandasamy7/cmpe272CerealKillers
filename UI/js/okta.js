@@ -7,6 +7,7 @@ var oktaSignIn = new OktaSignIn({
                 display: 'page'
         }
 });
+var HOME = 'http://hr.mymsseprojects.com';
 var idToken;
 var accessToken;
 var employee_info;
@@ -18,22 +19,24 @@ function checkForTokens(osi) {
                 osi.authClient.token.parseFromUrl().then(function(tokens) {
                         for (i in tokens) {
                                 if (tokens[i].idToken) {
+					console.log("Found idToken from URL");
                                         osi.authClient.tokenManager.add('idToken',tokens[i]);
+					window.idToken = tokens[i];
                                 }
                                 if (tokens[i].accessToken) {
+					console.log("Found accessToken from URL");
                                         osi.authClient.tokenManager.add('accessToken',tokens[i]);
+					window.accessToken = tokens[i];
                                 }
                         }
+			location.replace(window.HOME);
                 });
                 return true;
         } else if (window.localStorage.getItem('okta-token-storage') !== null) {
                 console.log("Tokens in localStorage");
                 let tokens = JSON.parse( window.localStorage.getItem('okta-token-storage') );
-                console.log(tokens);
-                window.idToken     = tokens.idToken;
-                window.accessToken = tokens.accessToken;
-                console.log(window.accessToken);
-                console.log(window.idToken);
+		window.idToken = tokens.idToken;
+		window.accessToken = tokens.accessToken;
                 history.pushState("", document.title, window.location.pathname);
                 return true;
         } else {
@@ -44,15 +47,16 @@ function checkForTokens(osi) {
 }
 
 function goToDashboard() {
-	location.replace("http://hr.mymsseprojects.com");
+	location.replace(window.HOME);
 }
 
 function getEmployeeInfo() {
         window.employee_info = JSON.parse(localStorage.getItem("einfo"));
         if (window.employee_info == null) {
-                location.replace('http://hr.mymsseprojects.com');
+                location.replace(window.HOME);
         }
 }
+
 
 function logout() {
         let osi = window.oktaSignIn;
@@ -64,7 +68,7 @@ function logout() {
                         $('#root').empty();
                         window.localStorage.removeItem('okta-token-storage');
                         window.localStorage.removeItem('einfo');
-			location.replace('http://hr.mymsseprojects.com');
+			location.replace(window.HOME);
                         //renderLogin(osi);
                 }
         });

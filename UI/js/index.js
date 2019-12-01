@@ -1,10 +1,8 @@
 
-var employee_info;
-
 function initUI() {
 	let hasTokens = checkForTokens(window.oktaSignIn);
 	if (hasTokens === true) {
-		getEmployeeInfo();
+		getEmployeeInfoLocalStorage();
 		renderContainers();
 	} else {
 		renderLogin(window.oktaSignIn);
@@ -12,8 +10,10 @@ function initUI() {
 
 }
 
-function getEmployeeInfo() {
-	let email = Cookies.get("ln");
+
+
+function getEmployeeInfoLocalStorage() {
+	let email = window.idToken.claims.email;
 
 	$.ajax({
 		url: 'get_employee_info.php',

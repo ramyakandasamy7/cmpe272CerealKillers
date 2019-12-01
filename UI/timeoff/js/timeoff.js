@@ -21,7 +21,7 @@ function renderContainers() {
                                 +"<i class='fas fa-sign-out-alt fa-2x' style='color: #cccccc'></i>"
                         +"</button>"
                 +"</nav>"	
-		+"<div class='container-fluid'>"
+		+"<div class='container-fluid' id='request_off'>"
 			+"<h2>Request Time Off</h2>"
 			+"<table class='table table-striped'>"
 				+"<thead>"
@@ -110,9 +110,10 @@ function getData() {
 
 
 	if (einfo.is_manager == "1") {
+		//$("#request_off").empty();
 		$("#root").append(
-			"<div class='container-fluid'>"
-			+"<h2>Time Off Requests</h2>"
+			"<div class='container-fluid' style='margin-bottom: 40px;'>"
+			+"<h2>Time Off Request ["+einfo.dept_name+" Department ("+einfo.dept_no+")]</h2>"
 			+"<table class='table table-striped' id='timeoff_requests_table'>"
 				+"<thead>"
 					+"<tr>"
@@ -127,7 +128,6 @@ function getData() {
 				+"<tbody>"
 				+"</tbody>"
 			+"</table>"
-			+"<button type='button' class='btn btn-primary' onclick='submitTimeOff();'>Submit</button>"
 		+"</div>"
 		);
 		$.ajax({
@@ -137,16 +137,24 @@ function getData() {
 		}).done(function(data, message, stat) {
 			if (stat.status === 200) {
 				console.log(data);
+				for (i in data.data) {
+					if (data.data[i].status === "Pending") {
+						data.data[i]['option'] = "<button type='button' class='btn btn-primary btn-sm' onclick='accept("+data.data[i].id+")'>Accept</button>";
+						data.data[i]['option'] += "<button type='button' class='btn btn-danger btn-sm' onclick='decline("+data.data[i].id+")'>Decline</button>";
+					} else {
+						data.data[i]['option'] = "Completed";
+					}
+				}
 				$("#timeoff_requests_table").DataTable({
                                         "pageLength": 10,
                                         "data": data.data,
                                         "columns": [
-                                                { "data": "employee_id"     },
-                                                { "data": "start_date"  },
-                                                { "data": "end_date"       },
-                                                { "data": "status" },
+                                                { "data": "employee_id"   },
+                                                { "data": "start_date"    },
+                                                { "data": "end_date"      },
+                                                { "data": "status"        },
                                                 { "data": "numberofhours" },
-                                                { "data": "id"  }
+                                                { "data": "option"        }
                                         ]
                                 });
 			}
