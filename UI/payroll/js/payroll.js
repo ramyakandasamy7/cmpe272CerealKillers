@@ -1,6 +1,4 @@
 
-var employee_info;
-
 function initUI() {
 	let hasTokens = checkForTokens(window.oktaSignIn);
         if (hasTokens === true) {
@@ -10,13 +8,6 @@ function initUI() {
         } else {
                 location.replace('http://hr.mymsseprojects.com');
         }
-}
-
-function getEmployeeInfo() {
-	window.employee_info = JSON.parse(localStorage.getItem("einfo"));
-	if (window.employee_info == null) {
-		location.replace('http://hr.mymsseprojects.com');
-	}
 }
 
 function renderContainers() {
@@ -31,16 +22,16 @@ function renderContainers() {
                         +"</button>"
                 +"</nav>"	
 		+"<div class='container-fluid'>"
-			+"<h2>Payroll History</h2>"
+			+"<h2 id='payroll_title'></h2>"
 			+"<table class='table table-striped table-sm' id='payroll_table'>"
 				+"<thead>"
 					+"<tr>"
 						+"<th>Employee ID</th>"
 						+"<th>Date Paid</th>"
-						+"<th>Hourly Rate</th>"
+						+"<th>Hourly Rate $</th>"
 						+"<th>Hours Paid</th>"
-						+"<th>Total Paid</th>"
-						+"<th>Tax</th>"
+						+"<th>Total Paid $</th>"
+						+"<th>Tax %</th>"
 						+"<th>PTO Rate</th>"
 					+"</tr>"
 				+"</thead>"
@@ -53,15 +44,19 @@ function renderContainers() {
 function getPayrollData() {
 	let einfo = window.employee_info;
 
-	if (einfo.is_manager) {
+	console.log(einfo);
+
+	if (einfo.is_manager == "1") {
+		$("#payroll_title").append("Payroll for "+einfo.dept_name+" Department ("+einfo.dept_no+")");
 		$.ajax({
 			url: 'http://54.165.80.211:3000/payrolls/'+einfo.dept_no,
 			type: 'GET',
 			dataType: 'json'
 		}).done(function(data, message, stat) {
+			console.log(data);
 			if (stat.status === 200) {
 				$("#payroll_table").DataTable({
-					"pageLength": 25,
+					"pageLength": 10,
 					"data": data,
 					"columns": [
 						{ "data": "emp_no"     },
@@ -76,6 +71,7 @@ function getPayrollData() {
 			}
 		});
 	} else {
+		$("#payroll_title").append("Payroll for "+einfo.first_name+" "+einfo.last_name+" ("+einfo.emp_no+")");
 		$.ajax({
 			url: 'http://54.165.80.211:3000/payroll/'+einfo.emp_no,
 			type: 'GET',
@@ -83,7 +79,7 @@ function getPayrollData() {
 		}).done(function(data, message, stat) {
 			if (stat.status === 200) {
 				$("#payroll_table").DataTable({
-					"pageLength": 25,
+					"pageLength": 10,
 					"data": data,
 					"columns": [
 						{ "data": "emp_no"     },
