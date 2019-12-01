@@ -16,11 +16,11 @@ var smtpTransport = nodemailer.createTransport({
 var mailOptions;
 var con = mysql.createConnection(
   {
-    host: "18.208.107.185",
+    host: "INSERT",
     user: "root",
-    password: "Cmpe272!",
+    password: "INSERT",
     port: 3306,
-    database: "employees"
+    database: "INSERT"
   },
   { multipleStatements: true }
 );
