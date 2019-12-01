@@ -1,5 +1,13 @@
 
 'use strict';
+var nodemailer = require('nodemailer');
+var smtpTransport = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: "garagegymcloud@gmail.com",
+    pass: "garagegym123!"
+  }
+});
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
   host     : '18.208.107.185',
@@ -211,13 +219,21 @@ exports.list_all_expenses = function(req, res) {
 
 exports.create_a_expense = function(req, res) {
   var employee_id = req.body.employee_id;
-  var date = req.body.date;
   var amount = req.body.amount;
+  var userEmail = 'horaymond6@gmail.com'
   connection.query('INSERT INTO expenses(employee_id, amount) VALUES('+ "'"  + employee_id +"','"  + amount +"')", function(err, result) {
     if(err) {
         res.send(err);
     }
     else {
+      var mailOptions = {
+        to: userEmail,
+        subject: "Expense Confirmation",
+        html:"Expense from user has been made."
+      };
+      smtpTransport.sendMail(mailOptions, (err, response) => {
+            
+      });
         res.json(result);
     }
 })

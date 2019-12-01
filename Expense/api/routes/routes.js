@@ -60,7 +60,7 @@ module.exports = function(app) {
   app.route('/expenseimage/:filename')
   .get(todoList.display_image);
 
-//CALL TO CREATE EXPENSES
+//CALL TO CREATE EXPENSES USING 'employee_id' and 'amount'
   app.route('/expenses')
   .post(todoList.create_a_expense);
 
