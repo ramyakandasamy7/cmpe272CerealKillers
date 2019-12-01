@@ -8,17 +8,17 @@ module.exports = function(app) {
   app.use(methodOverride('_method'));
   app.set('view engine', 'ejs');
   // todoList Routes
-  app.route('/userexpense')
+ /* app.route('/userexpense')
     .get(todoList.expense_limit)
     .post(todoList.create_expenselimit);
 
     app.route('/userexpense/:expenseId')
     .get(todoList.read_expense_limit)
     .put(todoList.update_expense_limit)
-    .delete(todoList.delete_expense_limit);
+    .delete(todoList.delete_expense_limit);*/
 
 
-    var path = require('path')
+    /*var path = require('path')
     var crypto = require('crypto');
     var Grid = require('gridfs-stream');
     var mongoose = require('mongoose');
@@ -48,17 +48,17 @@ module.exports = function(app) {
         });
       }
     });
-    var upload = multer({storage: storage});
+    var upload = multer({storage: storage});*/
 
   app.route('/')
     .get(todoList.showexpense)
 
-  app.route('/expenseimage')
+  /*app.route('/expenseimage')
   .get(todoList.get_image)
   .post(upload.single('file'), todoList.upload_image);
 
   app.route('/expenseimage/:filename')
-  .get(todoList.display_image);
+  .get(todoList.display_image);*/
 
 //CALL TO CREATE EXPENSES USING 'employee_id' and 'amount'
   app.route('/expenses')
@@ -85,5 +85,7 @@ module.exports = function(app) {
   app.route('/expenses/:expenseId')
     .get(todoList.read_a_expense)
     .put(todoList.update_a_expense)
-    .delete(todoList.delete_a_expense);
+  
+  app.route('/delete_expenses/:expenseId')
+    .post(todoList.delete_a_expense);
 };

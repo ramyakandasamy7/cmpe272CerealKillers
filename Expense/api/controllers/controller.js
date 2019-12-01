@@ -46,7 +46,7 @@ connection.query('SELECT * from expense_limit', function(err,result) {
 });
 */
 
-var mongoose = require('mongoose'),
+/*var mongoose = require('mongoose'),
   Expense = mongoose.model('Expenses'),
   limit = mongoose.model('ExpenseLimit'),
   ExpenseImage = mongoose.model('ExpenseImage');
@@ -80,13 +80,13 @@ var mongoose = require('mongoose'),
       });
     }
   });
-  var upload = multer({storage: storage});
+  var upload = multer({storage: storage});*/
 
   exports.showexpense = function(req, res) {
     res.render('index');
   }
 
-  exports.get_image = function(req,res) {
+  /*exports.get_image = function(req,res) {
     gfs.files.find().toArray((err, files) => {
       if(!files || files.length == 0) {
         return res.status(404).json({
@@ -122,8 +122,8 @@ var mongoose = require('mongoose'),
       if (err)
         res.send(err);
       res.json(image);
-    });*/
-  };
+    });
+  };*/
 
 //Expense Limit
 exports.expense_limit = function(req,res) {
@@ -285,7 +285,7 @@ exports.update_a_expense = function(req, res) {
 
 exports.delete_a_expense = function(req, res) {
   var id = req.params.expenseId;
-  connection.query("'DELETE FROM expenses WHERE id = '" + id  +"'", function(err, result) {
+  connection.query("DELETE FROM expenses WHERE id = " + id , function(err, result) {
     if(err) {
         res.send(err);
     }
