@@ -22,6 +22,8 @@ function getEmployeeInfo() {
 		dataType: 'json'
 	}).done(function(data, message, stat) {
 		if (stat.status === 200) {
+			console.log(data);
+			$('#welcome').html("Welcome back "+data.first_name+" "+data.last_name+"!");
 			window.employee_info = data;
 			localStorage.setItem('einfo',JSON.stringify(data));
 		} else {
@@ -45,7 +47,8 @@ function renderContainers() {
 	$('#root').append(
 		"<nav class='navbar navbar-light bg-dark'>"
 			+"<span class='navbar-brand mb-0 h1 text-white'>Zen HR Dashboard</span>"
-			+"<button type='button' class=' btn pull-right' title='Logout' onclick='logout();'>"
+			+"<h2 class='lead float-right text-white' id='welcome'></h2>"
+			+"<button type='button' class=' btn float-right' title='Logout' onclick='logout();'>"
 				+"<i class='fas fa-sign-out-alt fa-2x' style='color: #cccccc'></i>"
 			+"</button>"
 		+"</nav>"

@@ -20,6 +20,10 @@ session_start();
                 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
                 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
+		
+		<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css?t=<?php echo time();?>" type='text/css' rel='stylesheet'>
+                <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
 		<link href="/css/index.css?t=<?php echo time();?>" rel="stylesheet">
 		<link href="css/timeoff.css?t=<?php echo time();?>" rel="stylesheet">
 		<script src='/js/okta.js?t=<?php echo time();?>'></script>

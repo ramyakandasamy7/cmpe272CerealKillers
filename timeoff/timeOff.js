@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
+const cors = require("cors");
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -16,11 +18,11 @@ var smtpTransport = nodemailer.createTransport({
 var mailOptions;
 var con = mysql.createConnection(
   {
-    host: "INSERT",
+    host: "18.208.107.185",
     user: "root",
-    password: "INSERT",
+    password: "Cmpe272!",
     port: 3306,
-    database: "INSERT"
+    database: "employees"
   },
   { multipleStatements: true }
 );
@@ -71,20 +73,16 @@ Date.prototype.addHours = function(h) {
     req.body.endDateDay,
     req.body.empid
  */
-app.post("/createrequest", (req, res) => {
-  input_end_date = new Date(
-    req.body.endDateYear,
-    req.body.endDateMonth,
-    req.body.endDateDay
-  );
-  input_start_date = new Date(
-    req.body.startDateYear,
-    req.body.startDateMonth,
-    req.body.startDateDay
-  );
-  var numhours = getNumWorkDays(input_start_date, input_end_date) * 8;
+app.post("/createRequest", (req, res) => {
+  console.log(req.body);
+  var input_end_date   = new Date(req.body.end_date);
+  var input_start_date = new Date(req.body.start_date);
+  var emp_id           = req.body.emp_id;
+  var manager_email    = req.body.manager_email;
+  var numhours         = getNumWorkDays(input_start_date, input_end_date) * 8;
+  var link             = "http://localhost:4000";
   var entry = {
-    employee_id: req.body.empid,
+    employee_id: emp_id,
     end_date: input_end_date,
     start_date: input_start_date,
     status: "Pending",
@@ -92,13 +90,13 @@ app.post("/createrequest", (req, res) => {
   };
   con.query(
     "SELECT current_amount FROM pto where emp_no = ?",
-    req.body.empid,
+    emp_id,
     function(err, results) {
       if (err) {
       } else {
-        console.log("results are" + JSON.stringify(results));
+        console.log("results are: " + JSON.stringify(results));
         ptoHours = parseInt(results[0].current_amount);
-        console.log("Current Amount" + ptoHours + "num hours" + numhours);
+        console.log("Current Amount: " + ptoHours + " Num hours: " + numhours);
         if (ptoHours - numhours >= 0) {
           con.query("INSERT INTO timeoff SET ?", entry, function(err, results) {
             if (err) {
@@ -117,13 +115,11 @@ app.post("/createrequest", (req, res) => {
   );
 
   //email address of administrator
-  var emailAddress = req.body.emailaddress;
-  var link = "http://localhost:3000";
   mailOptions = {
-    to: emailAddress,
+    to: manager_email,
     subject: "You have Received a Request",
     html:
-      "Hello, You have received a request for time off. Please check this address" +
+      "Hello, You have received a request for time off. Please check this address " +
       link
   };
   smtpTransport.sendMail(mailOptions, (err, response) => {
@@ -248,31 +244,49 @@ app.post("/timeoffstatus", function(req, res) {
 });
 
 //get all requests based on a specific employee_id
-app.get("/employee/:id", (req, res) => {
+app.get("/employee/:emp_no", (req, res) => {
   //returns all requests
+  var emp_no = req.params.emp_no;
+  console.log("Getting timeoff list for emp_no: "+emp_no);
   con.query(
     "SELECT * FROM timeoff WHERE employee_id=?",
-    [req.body.id],
+    emp_no,
     function(err, data) {
       if (err) {
-        json.status(400).message({ error: err });
+        res.status(400);
+	res.send({ error: err });
       } else {
-        json.status(200).message({ message: JSON.stringify(data) });
+	con.query("SELECT * from pto where emp_no=?", emp_no, function(moreerr,moredata) {
+          if (moreerr) {
+            res.status(400);
+            res.send({ error: err });
+          } else {
+            res.status(200);
+            console.log(moredata);
+	    let ah = moredata[0].current_amount;
+	    console.log(ah);
+            res.json({ data:data, available_pto: ah });
+          }
+        });
       }
     }
   );
-  //returns time off total
-  con.query("SELECT * from pto where emp_no=?", [req.body.id], function(
-    err,
-    data
-  ) {
-    if (err) {
-      json.status(400).message({ error: err });
-    } else {
-      json.status(200).message({ message: JSON.stringify(data) });
-    }
-  });
+  
 });
+
+app.get("/department/:dept_no", (req, res) => {
+	var dept_no = req.params.dept_no;
+	con.query("SELECT * FROM timeoff;", function(err, data) {
+		if (err) {
+			res.status(400);
+			res.send(err);
+		} else {
+			res.status(200);
+			res.json({ data:data });
+		}
+	});
+});
+
 //only if administrator, can you use this method to add more hours
 app.post("/timeoffincrement", (req, res) => {
   //check if admin
@@ -305,6 +319,6 @@ app.post("/timeoffincrement", (req, res) => {
 });
 
 //method here to modify "status"
-app.listen("8000", () => {
+app.listen("4000", () => {
   console.log("up and running - time off service!");
 });

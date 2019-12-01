@@ -9,6 +9,7 @@ var oktaSignIn = new OktaSignIn({
 });
 var idToken;
 var accessToken;
+var employee_info;
 console.log(oktaSignIn);
 
 function checkForTokens(osi) {
@@ -46,6 +47,13 @@ function goToDashboard() {
 	location.replace("http://hr.mymsseprojects.com");
 }
 
+function getEmployeeInfo() {
+        window.employee_info = JSON.parse(localStorage.getItem("einfo"));
+        if (window.employee_info == null) {
+                location.replace('http://hr.mymsseprojects.com');
+        }
+}
+
 function logout() {
         let osi = window.oktaSignIn;
         osi.authClient.session.close().then(function(err) {
@@ -55,6 +63,7 @@ function logout() {
                         console.log("logout");
                         $('#root').empty();
                         window.localStorage.removeItem('okta-token-storage');
+                        window.localStorage.removeItem('einfo');
 			location.replace('http://hr.mymsseprojects.com');
                         //renderLogin(osi);
                 }
