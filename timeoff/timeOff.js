@@ -79,7 +79,8 @@ app.post("/createRequest", (req, res) => {
   var input_start_date = new Date(req.body.start_date);
   var emp_id           = req.body.emp_id;
   var manager_email    = req.body.manager_email;
-  var numhours         = getNumWorkDays(input_start_date, input_end_date) * 8;
+  var numhours         = req.body.num_hours;;
+  //var numhours         = getNumWorkDays(input_start_date, input_end_date) * 8;
   var link             = "http://localhost:4000";
   var entry = {
     employee_id: emp_id,
@@ -164,10 +165,10 @@ app.post("/deleterequest", function(req, res) {
 
 app.post("/timeoffstatus", function(req, res) {
   var emp_ID;
-  if (req.body.status == "declined") {
+  if (req.body.status == "Declined") {
     con.query(
       "UPDATE timeoff SET status=? WHERE id = ?",
-      ["declined", req.body.requestid, req.body.requestid],
+      ["Declined", req.body.requestid, req.body.requestid],
       function(err, results, fields) {
         if (err) {
           res.status(400).json({ error: err });
@@ -179,7 +180,7 @@ app.post("/timeoffstatus", function(req, res) {
   } else {
     con.query(
       "UPDATE timeoff SET status=? WHERE id = ?",
-      ["approved", req.body.requestid, req.body.requestid],
+      ["Approved", req.body.requestid, req.body.requestid],
       function(err, results, fields) {
         if (err) {
           res.status(400).json({ error: err });

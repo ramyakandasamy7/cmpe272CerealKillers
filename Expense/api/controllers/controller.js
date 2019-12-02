@@ -166,7 +166,6 @@ exports.read_expense_limit = function(req, res) {
   });*/
 };
 
-
 exports.update_expense_limit = function(req, res) {
   connection.query("UPDATE expense_limit SET expense_limit = " + req.body.limit + " WHERE employee_id = " + req.body.employee_id, function(err, result) {
     if(err) {
@@ -183,7 +182,6 @@ exports.update_expense_limit = function(req, res) {
   });*/
 };
 
-
 exports.delete_expense_limit = function(req, res) {
 
 
@@ -199,7 +197,7 @@ exports.delete_expense_limit = function(req, res) {
 //Expenses
 
 exports.list_dept_expenses = function(req, res) {
-  var dept_no = req.body.dept_no;
+  var dept_no = req.params.dept_no;
   connection.query("SELECT e.* from current_dept_emp c, expenses e WHERE c.emp_no = e.employee_id and c.dept_no = '" + dept_no + "'", function(err, result) {
     if(err) {
         res.send(err);
@@ -210,8 +208,8 @@ exports.list_dept_expenses = function(req, res) {
   })
 }
 
-exports.list_all_expenses = function(req, res) {
-    connection.query('SELECT * from expenses WHERE employee_id = ' + req.body.employee_id, function(err, result) {
+exports.list_emp_expenses = function(req, res) {
+    connection.query('SELECT * from expenses WHERE employee_id = ' + req.params.emp_no, function(err, result) {
         if(err) {
             res.send(err);
         }
@@ -226,14 +224,12 @@ exports.list_all_expenses = function(req, res) {
   });*/
 };
 
-
-
-
 exports.create_a_expense = function(req, res) {
   var employee_id = req.body.employee_id;
-  var amount = req.body.amount;
-  var userEmail = 'horaymond6@gmail.com'
-  connection.query('INSERT INTO expenses(employee_id, amount) VALUES('+ "'"  + employee_id +"','"  + amount +"')", function(err, result) {
+  var amount      = req.body.amount;
+  var file_path   = req.body.file_path;
+  var userEmail   = 'jed.villanueva86@gmail.com'
+  connection.query("INSERT INTO expenses(employee_id, amount, file_path) VALUES("  + employee_id +",'"  + amount +"','"+ file_path +"')", function(err, result) {
     if(err) {
         res.send(err);
     }
@@ -257,7 +253,6 @@ exports.create_a_expense = function(req, res) {
   });*/
 };
 
-
 exports.read_a_expense = function(req, res) {
   var id = req.params.expenseId;
   connection.query('SELECT * from expenses WHERE id=' + "'" + id + "'", function(err, result) {
@@ -274,7 +269,6 @@ exports.read_a_expense = function(req, res) {
     res.json(expense);
   });*/
 };
-
 
 exports.update_a_expense = function(req, res) {
   var id = req.params.expenseId;
@@ -293,7 +287,6 @@ exports.update_a_expense = function(req, res) {
     res.json(expense);
   });*/
 };
-
 
 exports.delete_a_expense = function(req, res) {
   var id = req.params.expenseId;

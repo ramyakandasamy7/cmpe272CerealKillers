@@ -10,6 +10,32 @@ function initUI() {
         }
 }
 
+function approve(timeoffId) {
+	$.ajax({
+		url: "http://54.165.80.211:4000/timeoffstatus",
+		type: "POST",
+		data: {status:"Approved",requestid:timeoffId},
+		dataType: "json"
+	}).done(function(data, message, stat) {
+		if (stat.status === 200) {
+			location.reload();
+		}
+	});
+}
+
+function decline(timeoffId) {
+	$.ajax({
+		url: "http://54.165.80.211:4000/timeoffstatus",
+		type: "POST",
+		data: {status:"Declined",requestid:timeoffId},
+		dataType: "json"
+	}).done(function(data, message, stat) {
+		if (stat.status === 200) {
+			location.reload();
+		}
+	});
+}
+
 function renderContainers() {
 	$('#root').append(
                 "<nav aria-label='breadcrumb' class='navbar navbar-light bg-dark'>"
@@ -57,6 +83,9 @@ function updateTotalWorkHours() {
 	if (sDate.toString() != "Invalid Date" && eDate.toString() != "Invalid Date") {
 		let total_hours = ((eDate - sDate)/(1000*60*60*24)*8)+8;
 		let apto = $("#available_pto").html();
+		if (total_hours > 40 && total_hours < 104) { total_hours -= 16;}
+		else if (total_hours > 104 && total_hours < 160) { total_hours -= 32;}
+		else if (total_hours > 152 && total_hours < 216) { total_hours -= 48;}
 		let paa  = apto - total_hours;
 		$("#total_work_hours").empty();
 		$("#total_work_hours").append(total_hours);
@@ -80,11 +109,14 @@ function submitTimeOff() {
 		let end_day     = (eDate.getDate() > 9) ? eDate.getDate() : ('0' + eDate.getDate());
 		let start_date  = start_year+"-"+start_month+"-"+start_day;
 		let end_date    = end_year+"-"+end_month+"-"+end_day;
+		if (total_hours > 40 && total_hours < 104) { total_hours -= 16;}
+		else if (total_hours > 104 && total_hours < 160) { total_hours -= 32;}
+		else if (total_hours > 152 && total_hours < 216) { total_hours -= 48;}
 		if (total_hours > 0) {
 			$.ajax({
 				url: "http://54.165.80.211:4000/createRequest",
 				type: "POST",
-				data: {emp_id:emp_id, start_date:start_date, end_date:end_date, manager_email:"jed.villanueva86@gmail.com"},
+				data: {emp_id:emp_id, start_date:start_date, end_date:end_date, num_hours: total_hours, manager_email:"jed.villanueva86@gmail.com"},
 			}).done(function(data, message, stat) {
 				if (stat.status === 200) {
 					alert("Time off request successfully sent!\nPlease wait for you manager to confirm before taking the requested time off.");
@@ -122,7 +154,7 @@ function getData() {
 						+"<th>End Date</th>"
 						+"<th>Status</th>"
 						+"<th>Number Of Hours</th>"
-						+"<th>Accept/Decline</th>"
+						+"<th>Approve/Decline</th>"
 					+"</tr>"
 				+"</thead>"
 				+"<tbody>"
@@ -139,10 +171,10 @@ function getData() {
 				console.log(data);
 				for (i in data.data) {
 					if (data.data[i].status === "Pending") {
-						data.data[i]['option'] = "<button type='button' class='btn btn-primary btn-sm' onclick='accept("+data.data[i].id+")'>Accept</button>";
+						data.data[i]['option'] = "<button type='button' class='btn btn-primary btn-sm' onclick='approve("+data.data[i].id+")'>Approve</button>";
 						data.data[i]['option'] += "<button type='button' class='btn btn-danger btn-sm' onclick='decline("+data.data[i].id+")'>Decline</button>";
 					} else {
-						data.data[i]['option'] = "Completed";
+						data.data[i]['option'] = data.data[i].status;
 					}
 				}
 				$("#timeoff_requests_table").DataTable({
