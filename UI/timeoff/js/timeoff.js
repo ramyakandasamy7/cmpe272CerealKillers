@@ -76,17 +76,34 @@ function renderContainers() {
 	$("#datepicker-end").datepicker({minDate: 0, beforeShowDay: $.datepicker.noWeekends});
 }
 
+function countWeekends(total_days, start_day) {
+	let weekendCount = 0;
+	let dayCount = start_day;
+	for (var i = 0; i < total_days; i++) {
+		if (dayCount == 0) {
+			weekendCount++;
+		}
+		if (dayCount == 6) {
+			weekendCount++;
+			dayCount = -1;
+		}
+		dayCount++;
+	}
+	return weekendCount;
+}
+
 function updateTotalWorkHours() {
 	let sDate = new Date( $("#datepicker-start").val() );
 	let eDate = new Date( $("#datepicker-end").val() );
 
 	if (sDate.toString() != "Invalid Date" && eDate.toString() != "Invalid Date") {
-		let total_hours = ((eDate - sDate)/(1000*60*60*24)*8)+8;
+		let total_days  = ((eDate - sDate)/(1000*60*60*24))+1;
+		let total_hours = (total_days*8);
 		let apto = $("#available_pto").html();
-		if (total_hours > 40 && total_hours < 104) { total_hours -= 16;}
-		else if (total_hours > 104 && total_hours < 160) { total_hours -= 32;}
-		else if (total_hours > 152 && total_hours < 216) { total_hours -= 48;}
+		let d1   = sDate.getDay();
 		let paa  = apto - total_hours;
+		let numWE = countWeekends(total_days, d1);
+		total_hours -= (numWE*8);
 		$("#total_work_hours").empty();
 		$("#total_work_hours").append(total_hours);
 		$("#pto_after_approval").empty();
@@ -100,7 +117,9 @@ function submitTimeOff() {
 	let emp_id = window.employee_info.emp_no;
 
 	if (sDate.toString() != "Invalid Date" && eDate.toString() != "Invalid Date") {
-		let total_hours = ((eDate - sDate)/(1000*60*60*24)*8)+8;
+		let total_days  = ((eDate - sDate)/(1000*60*60*24))+1;
+		let total_hours = (total_days*8);
+		let d1          = sDate.getDay();
 		let start_year  = sDate.getFullYear(); 
 		let start_month = (sDate.getMonth() > 8) ? (sDate.getMonth() + 1) : ('0' + (sDate.getMonth() +1));
 		let start_day   = (sDate.getDate() > 9) ? sDate.getDate() : ('0' + sDate.getDate());
@@ -109,9 +128,8 @@ function submitTimeOff() {
 		let end_day     = (eDate.getDate() > 9) ? eDate.getDate() : ('0' + eDate.getDate());
 		let start_date  = start_year+"-"+start_month+"-"+start_day;
 		let end_date    = end_year+"-"+end_month+"-"+end_day;
-		if (total_hours > 40 && total_hours < 104) { total_hours -= 16;}
-		else if (total_hours > 104 && total_hours < 160) { total_hours -= 32;}
-		else if (total_hours > 152 && total_hours < 216) { total_hours -= 48;}
+		let numWE       = countWeekends(total_days, d1);
+		total_hours     -= (numWE*8);
 		if (total_hours > 0) {
 			$.ajax({
 				url: "http://54.165.80.211:4000/createRequest",
