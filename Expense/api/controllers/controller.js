@@ -1,5 +1,8 @@
 
 'use strict';
+
+//var fs = require('fs');
+
 var nodemailer = require('nodemailer');
 var smtpTransport = nodemailer.createTransport({
   service: "Gmail",
@@ -82,9 +85,20 @@ connection.query('SELECT * from expense_limit', function(err,result) {
   });
   var upload = multer({storage: storage});*/
 
-  exports.showexpense = function(req, res) {
-    res.render('index');
-  }
+  /*exports.showexpense = function(req, res) {
+    var temppath = 'facebook.png'
+    fs.open(temppath, 'r', function(status,fd) {
+      var stats = fs.statSync(temppath);
+      var filesize = stats["size"];
+      var buffer = new Buffer(filesize);
+      fs.read(fd, buffer, 0, filesize, 0, function(err,num) {
+        console.log(buffer)
+        res.write(buffer)
+        res.end();
+      })
+      //fs.writeFile('abc.png', buffer, 'binary', function(err){})
+    });
+  }*/
 
   /*exports.get_image = function(req,res) {
     gfs.files.find().toArray((err, files) => {
@@ -124,6 +138,20 @@ connection.query('SELECT * from expense_limit', function(err,result) {
       res.json(image);
     });
   };*/
+
+
+  /*exports.upload_image = function(req, res) {
+    var temppath = 'facebook.png'
+    fs.open(temppath, 'r', function(status,fd) {
+      var stats = fs.statSync(temppath);
+      var filesize = stats["size"];
+      var buffer = new Buffer(filesize);
+      fs.read(fd, buffer, 0, filesize, 0, function(err,num) {
+        console.log(buffer)
+      })
+      //fs.writeFile('abc.png', buffer, 'binary', function(err){})
+    });
+  }*/
 
 //Expense Limit
 exports.expense_limit = function(req,res) {
@@ -185,7 +213,15 @@ exports.update_expense_limit = function(req, res) {
 
 
 exports.delete_expense_limit = function(req, res) {
-
+  var id = req.body.employee_id;
+  connection.query("DELETE FROM expense_limit WHERE employee_id = " + id , function(err, result) {
+    if(err) {
+        res.send(err);
+    }
+    else {
+        res.json(result);
+    }
+  })
 
   /*limit.remove({
     _id: req.params.expenseId

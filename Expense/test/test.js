@@ -11,7 +11,7 @@ describe ("CREATE ONE EXPENSE", function(){
         console.log ("Creating expense first.")
         chai.request("http://localhost:3000")
             .post("/expenses/")
-            .send({"employee_id": "1"})
+            .send({"employee_id": "1", "amount": 50})
             .end((err,res)=>{
                 res.should.have.status(200);
                 var a = JSON.parse(res.text);
@@ -113,7 +113,8 @@ describe ("UPDATE ONE LIMIT", function(){
 describe ("DELETE ONE LIMIT", function(){
     it("should delete an expense", done=>{
         chai.request("http://localhost:3000")
-            .post("/delete_expenses/" + global_id)
+            .post("/deletelimit/" )
+            .send({"employee_id": "1"})
             .end((err,res)=>{
                 var a = JSON.parse(res.text)
                 var hasError = a.code
