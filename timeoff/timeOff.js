@@ -277,7 +277,7 @@ app.get("/employee/:emp_no", (req, res) => {
 
 app.get("/department/:dept_no", (req, res) => {
 	var dept_no = req.params.dept_no;
-	con.query("SELECT * FROM timeoff;", function(err, data) {
+	con.query("SELECT t.*,e.first_name, e.last_name FROM timeoff t INNER JOIN employees e ON e.emp_no=t.employee_id;", function(err, data) {
 		if (err) {
 			res.status(400);
 			res.send(err);

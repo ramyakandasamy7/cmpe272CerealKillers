@@ -1,5 +1,7 @@
+var pubip;
 
-function initUI() {
+function initUI(pubip) {
+	window.pubip = pubip;
 	let hasTokens = checkForTokens(window.oktaSignIn);
         if (hasTokens === true) {
                 renderContainers();
@@ -12,7 +14,7 @@ function initUI() {
 
 function approve(timeoffId) {
 	$.ajax({
-		url: "http://54.165.80.211:4000/timeoffstatus",
+		url: "http://"+window.pubip+":4000/timeoffstatus",
 		type: "POST",
 		data: {status:"Approved",requestid:timeoffId},
 		dataType: "json"
@@ -25,7 +27,7 @@ function approve(timeoffId) {
 
 function decline(timeoffId) {
 	$.ajax({
-		url: "http://54.165.80.211:4000/timeoffstatus",
+		url: "http://"+window.pubip+":4000/timeoffstatus",
 		type: "POST",
 		data: {status:"Declined",requestid:timeoffId},
 		dataType: "json"
@@ -70,6 +72,7 @@ function renderContainers() {
 				+"</tbody>"
 			+"</table>"
 			+"<button type='button' class='btn btn-primary' onclick='submitTimeOff();'>Submit</button>"
+			+"<hr/>"
 		+"</div>"
 	);
 	$("#datepicker-start").datepicker({minDate: 0, beforeShowDay: $.datepicker.noWeekends});
@@ -132,7 +135,7 @@ function submitTimeOff() {
 		total_hours     -= (numWE*8);
 		if (total_hours > 0) {
 			$.ajax({
-				url: "http://54.165.80.211:4000/createRequest",
+				url: "http://"+window.pubip+":4000/createRequest",
 				type: "POST",
 				data: {emp_id:emp_id, start_date:start_date, end_date:end_date, num_hours: total_hours, manager_email:"jed.villanueva86@gmail.com"},
 			}).done(function(data, message, stat) {
@@ -158,20 +161,21 @@ function getData() {
 	let dn = einfo.dept_no;
 	console.log(einfo);
 
-
 	if (einfo.is_manager == "1") {
 		//$("#request_off").empty();
 		$("#root").append(
 			"<div class='container-fluid' style='margin-bottom: 40px;'>"
 			+"<h2>Time Off Request ["+einfo.dept_name+" Department ("+einfo.dept_no+")]</h2>"
+			+"<hr/>"
 			+"<table class='table table-striped' id='timeoff_requests_table'>"
 				+"<thead>"
 					+"<tr>"
 						+"<th>Employee ID</th>"
+						+"<th>Employee Name</th>"
 						+"<th>Start Date</th>"
 						+"<th>End Date</th>"
-						+"<th>Status</th>"
 						+"<th>Number Of Hours</th>"
+						+"<th>Status</th>"
 						+"<th>Approve/Decline</th>"
 					+"</tr>"
 				+"</thead>"
@@ -181,18 +185,19 @@ function getData() {
 		+"</div>"
 		);
 		$.ajax({
-			url: "http://54.165.80.211:4000/department/"+dn,
+			url: "http://"+window.pubip+":4000/department/"+dn,
 			type: "GET",
 			dataType: "json"
 		}).done(function(data, message, stat) {
 			if (stat.status === 200) {
 				console.log(data);
 				for (i in data.data) {
+					data.data[i].name = data.data[i].first_name+" "+data.data[i].last_name; 
 					if (data.data[i].status === "Pending") {
-						data.data[i]['option'] = "<button type='button' class='btn btn-primary btn-sm' onclick='approve("+data.data[i].id+")'>Approve</button>";
+						data.data[i]['option'] = "<button type='button' class='btn btn-primary btn-sm' style='margin-right: 10px;' onclick='approve("+data.data[i].id+")'>Approve</button>";
 						data.data[i]['option'] += "<button type='button' class='btn btn-danger btn-sm' onclick='decline("+data.data[i].id+")'>Decline</button>";
 					} else {
-						data.data[i]['option'] = data.data[i].status;
+						data.data[i]['option'] = "";
 					}
 				}
 				$("#timeoff_requests_table").DataTable({
@@ -200,10 +205,11 @@ function getData() {
                                         "data": data.data,
                                         "columns": [
                                                 { "data": "employee_id"   },
+                                                { "data": "name"          },
                                                 { "data": "start_date"    },
                                                 { "data": "end_date"      },
-                                                { "data": "status"        },
                                                 { "data": "numberofhours" },
+                                                { "data": "status"        },
                                                 { "data": "option"        }
                                         ]
                                 });
@@ -211,7 +217,7 @@ function getData() {
 		});
 	} else {
 		$.ajax({
-			url: "http://54.165.80.211:4000/employee/"+id,
+			url: "http://"+window.pubip+":4000/employee/"+id,
 			type: "GET",
 			dataType: "json"
 		}).done(function(data, message, stat) {
@@ -220,6 +226,42 @@ function getData() {
 				$("#available_pto").append(data.available_pto);
 			} else {
 				alert("Error: "+stat.responseText);
+			}
+		});
+		$("#root").append(
+			"<div class='container-fluid' style='margin-bottom: 40px; margin-top: 20px;'>"
+			+"<h2>Time Off Request ["+einfo.first_name+" "+einfo.last_name+" ("+einfo.emp_no+")]</h2>"
+			+"<table class='table table-striped' id='timeoff_requests_table'>"
+				+"<thead>"
+					+"<tr>"
+						+"<th>Start Date</th>"
+						+"<th>End Date</th>"
+						+"<th>Number Of Hours</th>"
+						+"<th>Status</th>"
+					+"</tr>"
+				+"</thead>"
+				+"<tbody>"
+				+"</tbody>"
+			+"</table>"
+		+"</div>"
+		);
+		$.ajax({
+			url: "http://"+window.pubip+":4000/employee/"+einfo.emp_no,
+			type: "GET",
+			dataType: "json"
+		}).done(function(data, message, stat) {
+			if (stat.status === 200) {
+				console.log(data);
+				$("#timeoff_requests_table").DataTable({
+                                        "pageLength": 10,
+                                        "data": data.data,
+                                        "columns": [
+                                                { "data": "start_date"    },
+                                                { "data": "end_date"      },
+                                                { "data": "numberofhours" },
+                                                { "data": "status"        }
+                                        ]
+                                });
 			}
 		});
 	}

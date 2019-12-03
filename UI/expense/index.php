@@ -1,6 +1,7 @@
 <?php
 session_start();
-
+$cmd = "curl ifconfig.me";
+$out = exec($cmd, $output, $ec);
 ?>
 <html>
 	<head>
@@ -25,7 +26,7 @@ session_start();
 		<script src='js/expense.js?t=<?php echo time();?>'></script>
 		<script type='text/javascript'>
 			$(document).ready(function() {
-				initUI();
+				initUI('<?php echo "$out"; ?>');
 			});
 		</script>
 	</head>

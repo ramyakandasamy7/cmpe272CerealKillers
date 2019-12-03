@@ -198,7 +198,8 @@ exports.delete_expense_limit = function(req, res) {
 
 exports.list_dept_expenses = function(req, res) {
   var dept_no = req.params.dept_no;
-  connection.query("SELECT e.* from current_dept_emp c, expenses e WHERE c.emp_no = e.employee_id and c.dept_no = '" + dept_no + "'", function(err, result) {
+  //connection.query("SELECT e.* from current_dept_emp c, expenses e WHERE c.emp_no = e.employee_id and c.dept_no = '" + dept_no + "'", function(err, result) {
+  connection.query("SELECT x.*, e.first_name, e.last_name FROM expenses x INNER JOIN employees e ON e.emp_no=x.employee_id;", function(err, result) {
     if(err) {
         res.send(err);
     }

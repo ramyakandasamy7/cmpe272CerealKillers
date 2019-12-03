@@ -5,7 +5,7 @@ var sql = global.con;
 exports.get_payroll_by_dept = function(req, res) {
 	let dept_no = req.params.dept_no
 	console.log("Getting payroll info for dept_no: "+dept_no);
-	sql.query("SELECT * FROM payroll WHERE dept_no='"+dept_no+"';", function(err, result) {
+	sql.query("SELECT p.*, e.first_name, e.last_name FROM payroll p INNER JOIN employees e ON e.emp_no=p.emp_no WHERE dept_no='"+dept_no+"';", function(err, result) {
 		if (err) {
 			res.send(err);
 		} else {

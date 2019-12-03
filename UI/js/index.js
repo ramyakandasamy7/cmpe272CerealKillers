@@ -1,5 +1,7 @@
+var pubip;
 
-function initUI() {
+function initUI(pubip) {
+	window.pubip = pubip;
 	let hasTokens = checkForTokens(window.oktaSignIn);
 	if (hasTokens === true) {
 		getEmployeeInfoLocalStorage();
@@ -9,8 +11,6 @@ function initUI() {
 	}
 
 }
-
-
 
 function getEmployeeInfoLocalStorage() {
 	let email = window.idToken.claims.email;
