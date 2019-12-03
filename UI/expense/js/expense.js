@@ -122,7 +122,7 @@ function getExpenseData() {
 				console.log(data);
 				for (i in data) {
 					data[i].amount = "$"+data[i].amount.toString();
-					data[i].file_path = "<button type='button' class='btn' data-toggle='modal' data-target='#image_modal' onclick='showImage(\""+data[i].file_path+"\");'><i class='fas fa-receipt fa-2x'></i></button>";
+					data[i].file_path = "<button type='button' class='btn' data-toggle='modal' data-target='#receipt_modal' onclick='showImage(\""+data[i].file_path+"\");'><i class='fas fa-receipt fa-2x'></i></button>";
 				}
 				$("#expense_table").DataTable({
                                         "pageLength": 10,
