@@ -4,10 +4,161 @@ function initUI() {
 
 	let hasTokens = checkForTokens(window.oktaSignIn);
         if (hasTokens === true) {
+		getEmployeeInfo();
                 renderContainers();
+		getExpenseData();
         } else {
                 location.replace('http://hr.mymsseprojects.com');
         }
+}
+
+function approve(exId) {
+	$.ajax({
+		url: 'http://54.165.80.211:5000/expenses/'+exId.toString(),
+		type: 'PUT',
+		data: {status:"Approved"},
+		dataType: 'json'
+	}).done(function(data, message, stat) {
+		if (stat.status === 200) {
+			location.reload();
+		}
+	});
+}
+
+function decline(exId) {
+	$.ajax({
+		url: 'http://54.165.80.211:5000/expenses/'+exId.toString(),
+		type: 'PUT',
+		data: {status:"Declined"},
+		dataType: 'json'
+	}).done(function(data, message, stat) {
+		if (stat.status === 200) {
+			location.reload();
+		}
+	});
+}
+
+function getExpenseData() {
+	let einfo = window.employee_info;
+
+	if (einfo.is_manager == "1") {
+		$('#expense_title').append("Expenses for "+einfo.dept_name+" Department ("+einfo.dept_no+")");
+		$('#file_expense').hide();
+		$('#table_container').append(
+			"<table class='table table-striped' id='expense_table'>"
+				+"<thead>"
+					+"<tr>"
+						+"<th>Employee ID</th>"
+						+"<th>Date</th>"
+						+"<th>Amount</th>"
+						+"<th>Status</th>"
+					+"</tr>"
+				+"</thead>"
+
+			+"</table>"
+		);
+		$.ajax({
+			url: 'http://54.165.80.211:5000/deptexpenses/'+einfo.dept_no,
+			type: 'GET',
+			dataType: 'json'
+		}).done(function(data, message, stat) {
+			if (stat.status === 200) {
+				console.log(data);
+				
+				for (i in data) {
+					data[i].status = (data[i].status === 'Pending') ? "<button type='button' class='btn btn-primary btn-sm' onclick='approve("+data[i].id+")'>Approve</button><button type='button' class='btn btn-danger btn-sm' onclick='decline("+data[i].id+")'>Decline</button>": data[i].status;
+				}
+				$("#expense_table").DataTable({
+                                        "pageLength": 10,
+                                        "data": data,
+                                        "columns": [
+                                                { "data": "employee_id" },
+                                                { "data": "create_date" },
+                                                { "data": "amount"      },
+                                                { "data": "status"      }
+                                        ]
+                                });
+			} else {
+				alert("Error: "+stat.responseText);
+			}
+		});
+	} else {
+		$('#expense_title').append("Expenses for "+einfo.first_name+" "+einfo.last_name+" ("+einfo.emp_no+")");
+		$('#table_container').append(
+			"<table class='table table-striped' id='expense_table'>"
+				+"<thead>"
+					+"<tr>"
+						+"<th>Date</th>"
+						+"<th>Amount</th>"
+						+"<th>Status</th>"
+					+"</tr>"
+				+"</thead>"
+
+			+"</table>"
+		);
+		$.ajax({
+			url: 'http://54.165.80.211:5000/empexpenses/'+einfo.emp_no,
+			type: 'GET',
+			dataType: 'json'
+		}).done(function(data, message, stat) {
+			if (stat.status === 200) {
+				console.log(data);
+				for (i in data) {
+					data[i].amount = "$"+data[i].amount.toString();
+				}
+				$("#expense_table").DataTable({
+                                        "pageLength": 10,
+                                        "data": data,
+                                        "columns": [
+                                                { "data": "create_date" },
+                                                { "data": "amount"      },
+                                                { "data": "status"      }
+                                        ]
+                                });
+			} else {
+				alert("Error: "+stat.responseText);
+			}
+		});
+	}
+}
+
+function submitExpense() {
+	let amount = $('#amount').val();
+	var fd = $('#expense_file').prop('files')[0];
+	var form_data = new FormData();
+	form_data.append('file',fd);
+	$.ajax({
+		url: "upload_receipt.php",
+		dataType: 'text',
+		cache: false,
+		contentType: false,
+		processData: false,
+		data: form_data,
+		type: 'POST'
+	}).done(function(data, message, stat) {
+		if (stat.status === 200) {
+			let fpath = JSON.parse(data).Filepath; 
+			insertToDB(fpath, amount);
+		}
+	});
+}
+
+function insertToDB(fpath, amount) {
+	let einfo = window.employee_info;
+
+	$.ajax({
+		url: 'http://54.165.80.211:5000/expenses',
+		type: 'POST',
+		data: { employee_id: einfo.emp_no, amount: amount, file_path: fpath},
+		dataType: "json"
+	}).done(function(data, message, stat) {
+		if (stat.status === 200) {
+			alert("Expense filing success!");
+			location.reload();
+		} else {
+			alert("Error: "+stat.responseText);
+		}
+	});
 }
 
 function renderContainers() {
@@ -21,19 +172,9 @@ function renderContainers() {
                                 +"<i class='fas fa-sign-out-alt fa-2x' style='color: #cccccc'></i>"
                         +"</button>"
                 +"</nav>"	
-		+"<div class='container-fluid'>"
-			+"<h2>Expenses History</h2>"
-			+"<button type='button' class='btn btn-primary btn-sm' style='margin-bottom: 10px;' data-toggle='modal' data-target='#expense_input'>File An Expense</button>"
-			+"<table class='table table-striped'>"
-				+"<thead>"
-					+"<tr>"
-						+"<th>Date</th>"
-						+"<th>Amount</th>"
-						+"<th>Status</th>"
-					+"</tr>"
-				+"</thead>"
-
-			+"</table>"
+		+"<div class='container-fluid' id='table_container'>"
+			+"<h2 id='expense_title'></h2>"
+			+"<button type='button' id='file_expense' class='btn btn-primary btn-sm' style='margin-bottom: 10px;' data-toggle='modal' data-target='#expense_input'>File An Expense</button>"
 		+"</div>"
 	);
 }
@@ -65,7 +206,7 @@ function renderModals() {
 					+"</div>"
 					+"<div class='modal-footer'>"
 						+"<button type='button' class='btn btn-danger btn-sm' data-dismiss='modal'>Cancel</button>"
-						+"<button type='button' class='btn btn-primary btn-sm'>Submit</button>"
+						+"<button type='button' class='btn btn-primary btn-sm' onclick='submitExpense();'>Submit</button>"
 					+"</div>"
 				+"</div>"
 			+"</div>"

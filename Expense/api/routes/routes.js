@@ -63,10 +63,8 @@ module.exports = function(app) {
   app.route('/expenseimage/:filename')
   .get(todoList.display_image);*/
 
-
-
 //CALL TO GET EXPENSES OF DEPT using 'dept_no'
-  app.route('/deptexpenses')
+  app.route('/deptexpenses/:dept_no')
   .get(todoList.list_dept_expenses)
 
 //CALL TO CREATE EXPENSES USING 'employee_id' and 'amount'
@@ -74,8 +72,8 @@ module.exports = function(app) {
   .post(todoList.create_a_expense);
 
   //CALL TO GET ALL EXPENSES OF ONE PERSON USING 'employee_id'
-  app.route("/list_expenses")
-    .post(todoList.list_all_expenses);
+  app.route("/empexpenses/:emp_no")
+    .get(todoList.list_emp_expenses);
 
   //CALL TO GIVE SOMEONE AN EXPENSE LIMIT USING 'employee_id' and 'limit'
   app.route("/createlimit")
