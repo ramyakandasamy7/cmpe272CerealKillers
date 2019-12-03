@@ -5,7 +5,8 @@ var oktaSignIn = new OktaSignIn({
                 issuer: "https://dev-880333.okta.com/oauth2/default",
                 responseType: ['token', 'id_token'],
                 display: 'page'
-        }
+        },
+	logo: '/imgs/icon.png'
 });
 var HOME = 'http://hr.mymsseprojects.com';
 var idToken;
