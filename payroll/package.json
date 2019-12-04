@@ -18,8 +18,13 @@
     "nodemon": "^1.19.2"
   },
   "dependencies": {
+    "assert": "^2.0.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mysql": "^2.17.1"
+    "mocha": "^6.2.2",
+    "mysql": "^2.17.1",
+    "should": "^13.2.3"
   }
 }
