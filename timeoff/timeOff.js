@@ -127,7 +127,7 @@ app.post("/createRequest", (req, res) => {
   	      });
               res
                 .status(200)
-                .json({ message: "request added to timeoff database" });
+                .json({ message: "request added to timeoff database", result: results });
             }
           });
         } else {
