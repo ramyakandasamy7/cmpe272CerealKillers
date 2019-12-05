@@ -12,11 +12,11 @@ function initUI(pubip) {
         }
 }
 
-function approve(timeoffId) {
+function approve(timeoffId, email) {
 	$.ajax({
 		url: "http://"+window.pubip+":4000/timeoffstatus",
 		type: "POST",
-		data: {status:"Approved",requestid:timeoffId},
+		data: {status:"Approved",requestid:timeoffId,emailAddress:email},
 		dataType: "json"
 	}).done(function(data, message, stat) {
 		if (stat.status === 200) {
@@ -25,11 +25,11 @@ function approve(timeoffId) {
 	});
 }
 
-function decline(timeoffId) {
+function decline(timeoffId, email) {
 	$.ajax({
 		url: "http://"+window.pubip+":4000/timeoffstatus",
 		type: "POST",
-		data: {status:"Declined",requestid:timeoffId},
+		data: {status:"Declined",requestid:timeoffId,emailAddress:email},
 		dataType: "json"
 	}).done(function(data, message, stat) {
 		if (stat.status === 200) {
@@ -115,9 +115,12 @@ function updateTotalWorkHours() {
 }
 
 function submitTimeOff() {
+	let einfo  = window.employee_info;
 	let sDate  = new Date( $("#datepicker-start").val() );
 	let eDate  = new Date( $("#datepicker-end").val() );
-	let emp_id = window.employee_info.emp_no;
+	let emp_id = einfo.emp_no;
+	let fulln  = einfo.first_name+" "+einfo.last_name;
+	let email  = einfo.email;
 
 	if (sDate.toString() != "Invalid Date" && eDate.toString() != "Invalid Date") {
 		let total_days  = ((eDate - sDate)/(1000*60*60*24))+1;
@@ -137,10 +140,12 @@ function submitTimeOff() {
 			$.ajax({
 				url: "http://"+window.pubip+":4000/createRequest",
 				type: "POST",
-				data: {emp_id:emp_id, start_date:start_date, end_date:end_date, num_hours: total_hours, manager_email:"jed.villanueva86@gmail.com"},
+				data: {emp_id:emp_id, start_date:start_date, end_date:end_date, num_hours: total_hours, manager_email:"ramyakandasamy7@gmail.com"},
+				//data: {emp_id:emp_id, start_date:start_date, end_date:end_date, num_hours: total_hours, manager_email:"jed.villanueva86@gmail.com", fullname:fulln, email:email},
 			}).done(function(data, message, stat) {
 				if (stat.status === 200) {
 					alert("Time off request successfully sent!\nPlease wait for you manager to confirm before taking the requested time off.");
+					location.reload();
 				} else {
 					alert(stat.responseText);
 				}
@@ -162,7 +167,7 @@ function getData() {
 	console.log(einfo);
 
 	if (einfo.is_manager == "1") {
-		//$("#request_off").empty();
+		$("#request_off").empty();
 		$("#root").append(
 			"<div class='container-fluid' style='margin-bottom: 40px;'>"
 			+"<h2>Time Off Request ["+einfo.dept_name+" Department ("+einfo.dept_no+")]</h2>"
@@ -172,6 +177,7 @@ function getData() {
 					+"<tr>"
 						+"<th>Employee ID</th>"
 						+"<th>Employee Name</th>"
+						+"<th>Employee Email</th>"
 						+"<th>Start Date</th>"
 						+"<th>End Date</th>"
 						+"<th>Number Of Hours</th>"
@@ -194,8 +200,8 @@ function getData() {
 				for (i in data.data) {
 					data.data[i].name = data.data[i].first_name+" "+data.data[i].last_name; 
 					if (data.data[i].status === "Pending") {
-						data.data[i]['option'] = "<button type='button' class='btn btn-primary btn-sm' style='margin-right: 10px;' onclick='approve("+data.data[i].id+")'>Approve</button>";
-						data.data[i]['option'] += "<button type='button' class='btn btn-danger btn-sm' onclick='decline("+data.data[i].id+")'>Decline</button>";
+						data.data[i]['option'] = "<button type='button' class='btn btn-primary btn-sm' style='margin-right: 10px;' onclick='approve("+data.data[i].id+",\""+data.data[i].email+"\")'>Approve</button>";
+						data.data[i]['option'] += "<button type='button' class='btn btn-danger btn-sm' onclick='decline("+data.data[i].id+",\""+data.data[i].email+"\")'>Decline</button>";
 					} else {
 						data.data[i]['option'] = "";
 					}
@@ -206,6 +212,7 @@ function getData() {
                                         "columns": [
                                                 { "data": "employee_id"   },
                                                 { "data": "name"          },
+                                                { "data": "email"         },
                                                 { "data": "start_date"    },
                                                 { "data": "end_date"      },
                                                 { "data": "numberofhours" },

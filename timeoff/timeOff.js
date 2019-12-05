@@ -78,10 +78,13 @@ app.post("/createRequest", (req, res) => {
   var input_end_date   = new Date(req.body.end_date);
   var input_start_date = new Date(req.body.start_date);
   var emp_id           = req.body.emp_id;
+  var fullname         = req.body.fullname;
+  var emailAddress     = req.body.email;
   var manager_email    = req.body.manager_email;
   var numhours         = req.body.num_hours;;
   //var numhours         = getNumWorkDays(input_start_date, input_end_date) * 8;
   var link             = "http://localhost:4000";
+  var timeoffID;
   var entry = {
     employee_id: emp_id,
     end_date: input_end_date,
@@ -100,9 +103,28 @@ app.post("/createRequest", (req, res) => {
         console.log("Current Amount: " + ptoHours + " Num hours: " + numhours);
         if (ptoHours - numhours >= 0) {
           con.query("INSERT INTO timeoff SET ?", entry, function(err, results) {
+            console.log(results);
             if (err) {
               res.status(400).json({ error: err });
             } else {
+	      timeoffID = results.insertId;
+  	      //email address of administrator
+  	      mailOptions = {
+  	        to: manager_email,
+  	        subject: "You have Received a Request",
+  	        html:
+  	          "Hello,"
+  	          +"<br>You have received a request for time off from "+fullname+" to start on "+req.body.start_date+" and end on "+req.body.end_date+" for a total of "+numhours+" hours."
+  	          +"<br>Please <a href='http://hr.mymsseprojects.com/request_response?ans=y&id="+timeoffID+"&email="+emailAddress+"'>Accept</a> "
+  	          +"or <a href='http://hr.mymsseprojects.com/request_response?ans=n&id="+timeoffID+"&email="+emailAddress+"'>Decline</a> this request."
+  	      };
+  	      smtpTransport.sendMail(mailOptions, (err, response) => {
+  	        if (err) {
+  	          console.log(err);
+  	        } else {
+  	          console.log(response);
+  	        }
+  	      });
               res
                 .status(200)
                 .json({ message: "request added to timeoff database" });
@@ -115,21 +137,7 @@ app.post("/createRequest", (req, res) => {
     }
   );
 
-  //email address of administrator
-  mailOptions = {
-    to: manager_email,
-    subject: "You have Received a Request",
-    html:
-      "Hello, You have received a request for time off. Please check this address " +
-      link
-  };
-  smtpTransport.sendMail(mailOptions, (err, response) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log(response);
-    }
-  });
+  
 });
 /** deletes a request. User can only delete a pending request**/
 app.post("/deleterequest", function(req, res) {
@@ -277,7 +285,7 @@ app.get("/employee/:emp_no", (req, res) => {
 
 app.get("/department/:dept_no", (req, res) => {
 	var dept_no = req.params.dept_no;
-	con.query("SELECT t.*,e.first_name, e.last_name FROM timeoff t INNER JOIN employees e ON e.emp_no=t.employee_id;", function(err, data) {
+	con.query("SELECT t.*,e.first_name, e.last_name, e.email FROM timeoff t INNER JOIN employees e ON e.emp_no=t.employee_id;", function(err, data) {
 		if (err) {
 			res.status(400);
 			res.send(err);
